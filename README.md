@@ -38,6 +38,7 @@ sudo reboot
 
 ## 7- Install and configure xrdp
 ```
+sudo apt install -y xorg xinit x11-xserver-utils
 sudo apt install xrdp -y
 sudo raspi-config        # settings menu
 # 3 → Display Options → D1 → select X11 (disable Wayland)
