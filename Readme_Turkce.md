@@ -32,7 +32,36 @@ sudo apt update && sudo apt full-upgrade -y
 sudo reboot
 ```
 
-## 7- XRDP’yi Kurun ve Yapılandırın
+# XVNC ile başlatmalısın: 
+
+## 7- TigerVNC sunucusunu kurun
+```
+sudo apt update
+sudo apt install tigervnc-standalone-server tigervnc-common -y
+sudo mkdir -p /usr/lib/xrdp
+sudo ln -s /usr/lib/x86_64-linux-gnu/xrdp/libvnc.so /usr/lib/xrdp/libvnc.so
+echo "startlxde" > ~/.xsession
+sudo nano /etc/xrdp/startwm.sh
+```
+
+/etc/xrdp/startwm.sh dosyasının içi bu şekilde olmalı: 
+```
+#!/bin/sh
+unset DBUS_SESSION_BUS_ADDRESS
+unset XDG_RUNTIME_DIR
+exec startxfce4
+```
+
+Daha sonra Servisleri yeniden başlat:
+```
+sudo systemctl restart xrdp
+sudo systemctl restart vncserver-x11-serviced
+```
+```
+vncserver :10
+```
+
+## 8- XRDP’yi Kurun ve Yapılandırın
 ```
 sudo apt install xrdp -y
 sudo raspi-config        # settings menu
@@ -43,7 +72,7 @@ sudo systemctl restart xrdp
 
 Ardından sudo raspi-config tekrar → 5 Performance Options → P3 VNC → DISABLED (VNC, xrdp ile çakışır) yapın.
 
-## 8- Windows’tan MSTSC ile Bağlanın
+## 9- Windows’tan MSTSC ile Bağlanın
 
 Win + R → mstsc yazın.
 
