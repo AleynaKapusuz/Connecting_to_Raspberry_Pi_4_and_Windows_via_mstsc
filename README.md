@@ -1,67 +1,79 @@
-# Connecting_to_Raspberry_Pi_4_and_Windows_via_mstsc
+# Using Raspberry Pi via Remote Desktop (MSTSC)
 
-Connecting to a Raspberry Pi 4 and Windows via mstsc
+## 1 – Download Raspberry Pi Imager
+Get the Windows installer from: https://rpi.imager
 
-# Raspberry Pi Remote-Desktop Setup — Step-by-Step
-
-## 1- Raspberry Pi Remote-Desktop Setup — Step-by-Step (English)
-Download Raspberry Pi Imager
-Get the Windows installer from https://rpi.imager.
-
-## 2- Flash the microSD
-
+## 2 – Prepare the microSD Card
 ⚠️ Choose OS: “Raspberry Pi OS (64-bit)” – Bookworm.
 
-Write the image and eject the card safely.
+Write the image to your SD card and safely eject it.
 
-## 3- Do the first-boot setup on the Pi itself
+## 3 – Perform Initial Setup on the Pi
+Connect a monitor, keyboard, and mouse.
 
-Connect monitor, keyboard and mouse.
+During the setup wizard, enable all network options including SSH.
 
-In the first-run wizard enable all connectivity options, including SSH.
-
-## 4- Find the Pi’s IP from Windows
+## 4 – Find the Pi's IP Address on Windows
 ```
 ping raspberrypi.local
 ```
 
-## 5- SSH into the Pi
+## 5 – Connect to the Pi via SSH
 ```
 ssh pi@raspberrypi.local
 ```
 
-## 6- Update the system
+## 6 – Update the System
 ```
 sudo apt update && sudo apt full-upgrade -y
 sudo reboot
 ```
-
-## 7- Install and configure xrdp
+# You Must Use XVNC:
+## 7 – Install TigerVNC Server
 ```
-sudo apt install -y xorg xinit x11-xserver-utils
+sudo apt update
+sudo apt install tigervnc-standalone-server tigervnc-common -y
+sudo mkdir -p /usr/lib/xrdp
+sudo ln -s /usr/lib/x86_64-linux-gnu/xrdp/libvnc.so /usr/lib/xrdp/libvnc.so
+echo "startlxde" > ~/.xsession
+sudo nano /etc/xrdp/startwm.sh
+```
+Inside /etc/xrdp/startwm.sh, the content should be:
+```
+#!/bin/sh
+unset DBUS_SESSION_BUS_ADDRESS
+unset XDG_RUNTIME_DIR
+exec startxfce4
+```
+
+Then restart services:
+
+```
+sudo systemctl restart xrdp
+sudo systemctl restart vncserver-x11-serviced
+```
+
+Start the VNC session manually:
+
+```
+vncserver :10
+```
+
+## 8 – Install and Configure XRDP
+```
 sudo apt install xrdp -y
 sudo raspi-config        # settings menu
 # 3 → Display Options → D1 → select X11 (disable Wayland)
 sudo systemctl enable xrdp
 sudo systemctl restart xrdp
 ```
+Then run sudo raspi-config again → 5 Performance Options → P3 VNC → DISABLED (VNC conflicts with xrdp).
 
-Run sudo raspi-config again → 5 Performance Options → P3 VNC → set to DISABLED (VNC conflicts with xrdp).
+9 – Connect from Windows using MSTSC
+Press Win + R → type mstsc
 
-## 8- Connect from Windows with MSTSC
+In the “Computer” field, enter the Pi’s IP address.
 
-Win + R → mstsc
+Password: the user password you set during Raspberry Pi setup.
 
-Computer: enter the Pi’s IP address.
-
-Password: the password you set on the Pi.
-
-
-That’s it — you should now have a Remote Desktop session into your Raspberry Pi.
-
-
-
-
-
-
-
+That’s it — you can now connect to your Raspberry Pi via Remote Desktop!
